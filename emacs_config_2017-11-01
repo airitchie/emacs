@@ -1,0 +1,178 @@
+;; active Org-babel languages
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)))
+(setq org-plantuml-jar-path
+            (expand-file-name "/home/ritchie/mydata/Data-opt/jdk1.8.0_144/lib/plantuml.jar"))
+(load-file "/home/ritchie/.emacs.d/graphviz-dot-mode.el")
+;;显示行号.
+(global-linum-mode t)
+;;显示行号 end
+;;elpa
+(require 'package)
+;;; Standard package repositories
+;; We include the org repository for completeness, but don't normally
+;; use it.
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+;;; Also use Melpa for most packages
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/"))
+;;elpa end
+
+;;ccrpyt--加密文件设置
+(setq load-path (cons "/home/ritchie/.emacs.d/ccrypt-1.10/emacs" load-path))
+;;(load-file "/home/ritchie/.emacs.d/ps-ccrypt.el")
+(require 'ps-ccrypt "ps-ccrypt.el")
+;;ccrpyt end
+
+;;set windows numbering  
+(load-file "/home/ritchie/.emacs.d/myconfig/window-numbering.el")
+(require 'window-numbering)
+(window-numbering-mode 1)
+;;set windows numbering end
+
+;;set transparent effect  窗口透明
+(global-set-key [(f11)] 'loop-alpha)  
+(setq alpha-list '((100 100) (95 65) (85 55) (75 45) (65 35) (45 20)))  
+(defun loop-alpha ()  
+  (interactive)  
+  (let ((h (car alpha-list)))                ;; head value will set to  
+    ((lambda (a ab)  
+       (set-frame-parameter (selected-frame) 'alpha (list a ab))  
+       (add-to-list 'default-frame-alist (cons 'alpha (list a ab)))  
+       ) (car h) (car (cdr h)))  
+    (setq alpha-list (cdr (append alpha-list (list h))))  
+    )  
+) 
+;;set transparent effect  --ends here
+
+;;在行末或行中删除整行
+(defadvice kill-ring-save (before slickcopy activate compile)  
+  (interactive  
+   (if mark-active (list (region-beginning) (region-end))  
+     (list (line-beginning-position)  
+           (line-beginning-position 2)))))  
+(defadvice kill-region (before slickcut activate compile)  
+  (interactive  
+   (if mark-active (list (region-beginning) (region-end))  
+     (list (line-beginning-position)  
+           (line-beginning-position 2)))))
+;;在行末或行中删除整行 end
+
+;;set windows undo and redo  
+(when (fboundp 'winner-mode)  
+      (winner-mode 1)  
+(global-set-key (kbd "C-x 4 u") 'winner-undo)  
+(global-set-key (kbd "C-x 4 r") 'winner-redo)  
+)
+;;set windows undo and redo  end
+
+;;向下跳5行
+(global-set-key (kbd "C-M-n")  
+    (lambda () (interactive) (next-line 5)))  
+;;向下跳5行 end
+
+;;取消emacs启动动画
+(setq inhibit-startup-message t)
+;;取消emacs启动动画 ends here
+
+;;颜色主题.
+(load-file "/home/ritchie/.emacs.d/myconfig/color-theme.el")
+(require 'color-theme)
+;;颜色主题 ends here.
+
+;;自己定义快捷见语法实例
+(global-set-key (kbd "C-.") 'cua-rectangle-mark-mode)
+;;自己定义快捷见语法实例.
+
+;;GPG encrypt
+;;(require 'epa-file)
+;;(setq epa-file-select-keys 0)
+;;GPG encrypt ends here
+
+;;利用gpg加密文件的一部分
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+;打上"encrypt"标签的内容保存就加密
+(setq org-crypt-tag-matcher "encrypt")
+
+;;(setq org-tags-exclude-from-inheritance (quote("crypt")))
+;采用对称加密算法
+(setq org-crypt-key nil)
+
+(global-set-key (kbd "C-<") 'org-decrypt-entry)
+;;利用gpg加密文件的一部分 ends here.
+
+;;计划任务
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-todo-keywords
+    '((sequence "TODO(t!)" "UNDERWAY(u@/!)" "DONE(d@/!)" "WAITING(w@/!)" "CANCEL(c@/!)" )      
+     )) 
+
+;;计划任务
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+;; '(org-agenda-files
+;;   (quote
+ ;;    ("~/workinfo/mysql.org.cpt" "~/.emacs.d/todo/task.org" "~/.emacs.d/todo/inbox.org" "~/.emacs.d/todo/finished.org" "~/.emacs.d/todo/note.org" "~/.emacs.d/todo/trash.org" "~/.emacs.d/todo/project.org")))
+ )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+;;取消工具栏
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+;;取消工具栏--ends here
+;;高亮当前行
+(global-hl-line-mode 1)
+;;高亮当前行--ends here
+
+;;光标设置
+;调整光标粗细,数字越大光标越大,反之越小.
+(setq cursor-type '(bar . 2))
+(blink-cursor-mode -1)
+;;光标设置--ends here
+
+;;显示时间设置
+(display-time-mode 1) ;; 常显
+(setq display-time-24hr-format t) ;;格式 
+(setq display-time-day-and-date t) ;;显示时间、星期、日期
+;;显示时间设置--ends here
+
+;;gtd
+(setq org-agenda-files '("~/mydata/gtd/inbox.org"
+                         "~/mydata/gtd/gtd.org"
+                         "~/mydata/gtd/tickler.org"
+                         "~/mydata/gtd/someday.org"))
+
+;;(setq org-default-notes-file (concat org-directory "/notes.org"))
+(define-key global-map "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-iswitchb)
+;;(global-set-key "\C-cl" 'org-store-link)
+
+(setq org-capture-templates '(("t" "Todo [inbox]" entry
+                               (file+headline "~/mydata/gtd/inbox.org" "Tasks")
+                               "* TODO %i%?")
+                              ("T" "Tickler" entry
+                               (file+headline "~/mydata/gtd/tickler.org" "Tickler")
+                               "* %i%? \n %U")))
+;;重新提交的的目标
+(setq org-refile-targets '(("~/mydata/gtd/gtd.org" :maxlevel . 3) ;;
+                           ("~/mydata/gtd/someday.org" :level . 1)
+                          ("~/mydata/gtd/tickler.org" :maxlevel . 1)))
+
